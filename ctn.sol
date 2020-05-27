@@ -49,8 +49,7 @@ contract CTNToken is Ownable {
     uint32 public constant decimals = 18;
 
     uint constant restrictedPercent = 40; //should never be set above 100
-
-    bool public transferAllowed = false;
+ 
     bool public mintingFinished = false;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -59,19 +58,13 @@ contract CTNToken is Ownable {
     event MintFinished();
     event Burn(address indexed burner, uint256 value);
 
-    modifier whenTransferAllowed() {
-        if(msg.sender != owner){
-            require(transferAllowed);
-        }
-        _;
-    }
 
     modifier canMint() {
         require(!mintingFinished);
         _;
     }
 
-    function transfer(address _to, uint256 _value) whenTransferAllowed public returns (bool) {
+    function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
@@ -86,7 +79,7 @@ contract CTNToken is Ownable {
         return balances[_owner];
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) whenTransferAllowed public returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
@@ -122,9 +115,6 @@ contract CTNToken is Ownable {
         return allowed[_owner][_spender];
     }
 
-    function allowTransfer() onlyOwner public {
-        transferAllowed = true;
-    }
 
     function mint(address _to, uint256 _value) onlyOwner canMint public returns (bool) {
         require(_to != address(0));
@@ -175,4 +165,4 @@ contract CTNToken is Ownable {
         emit Burn(_from, _value);
         return true;
     }
-}
+}    
